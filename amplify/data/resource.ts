@@ -10,8 +10,10 @@ const schema = a.schema({
   Todo: a
     .model({
       content: a.string(),
+      type: a.string(),
     })
-    .authorization((allow) => [allow.publicApiKey()]),
+      .secondaryIndexes(index=>[index('type').queryField('listByType')])
+      .authorization((allow) => [allow.publicApiKey()]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
