@@ -12,6 +12,16 @@ const getCacheData = unstable_cache((id: string)=>{
     })
 },['todo'],{revalidate:30, tags:['todo-list']})
 
+// const getCacheData2 = unstable_cache((id: string)=>{
+//     return runWithAmplifyServerContext({
+//         nextServerContext: null,
+//         operation: async (contextSpec) => {
+//             const res =  await reqResBasedClient.models.Todo.listByType(contextSpec,{type:'TODO'});
+//             return res.data
+//         },
+//     })
+// },['todo'],{revalidate:30, tags:['todo-list']})
+
 type PageProps = {
     params: { id: string };
 };
