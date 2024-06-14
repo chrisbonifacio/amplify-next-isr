@@ -28,7 +28,16 @@ export default function App() {
   function createTodo() {
     client.models.Todo.create({
       content: window.prompt("Todo content"),
+        type:'TODO'
     });
+  }
+
+  function editTodo(id: string) {
+      client.models.Todo.update({
+          id:id,
+          content: window.prompt("Todo content"),
+          type:'TODO'
+      });
   }
 
   return (
@@ -37,7 +46,7 @@ export default function App() {
       <button onClick={createTodo}>+ new</button>
       <ul>
         {todos.map((todo) => (
-          <li key={todo.id}>{todo.content}</li>
+          <li key={todo.id}>{todo.id} {todo.content} <button onClick={() => editTodo(todo.id)}>edit</button></li>
         ))}
       </ul>
       <div>
