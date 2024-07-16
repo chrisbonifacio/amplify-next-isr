@@ -19,13 +19,15 @@ const getCacheData = unstable_cache(
         // });
         // return res.data;
 
-        const { data, errors } = await reqResBasedClient.models.Todo.listByType(
-          //@ts-ignore
-          contextSpec,
-          { type }
-        );
+        console.log({ type });
 
-        return data;
+        const res = await reqResBasedClient.graphql(contextSpec, {
+          query: listByType,
+          variables: {
+            type,
+          },
+        });
+        return res.data;
       },
     });
   },
@@ -34,12 +36,12 @@ const getCacheData = unstable_cache(
 );
 
 type PageProps = {
-  params: { type: string };
+  searchParams: { type: string };
 };
 
-const Page = async ({ params }: PageProps) => {
-  const data = await getCacheData(params.type);
-  return <div>content:{data[0].content}</div>;
+const Page = async ({ searchParams }: PageProps) => {
+  const { listByType: data } = await getCacheData(searchParams.type);
+  return <div>content:{data?.items[0].content}</div>;
 };
 
 export default Page;
