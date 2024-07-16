@@ -1,38 +1,45 @@
-import React from 'react';
-import {reqResBasedClient, runWithAmplifyServerContext} from "@/app/isr/[id]/_lib/amplifyServerUtils";
-import {unstable_cache} from "next/cache";
+import React from "react";
+import {
+  reqResBasedClient,
+  runWithAmplifyServerContext,
+} from "@/app/isr/[id]/_lib/amplifyServerUtils";
+import { unstable_cache } from "next/cache";
+import { listByType } from "@/queries";
 
-const getCacheData = unstable_cache((id: string)=>{
+const getCacheData = unstable_cache(
+  (type: string) => {
     return runWithAmplifyServerContext({
-        nextServerContext: null,
-        operation: async (contextSpec) => {
-          const res =  await reqResBasedClient.models.Todo.get(contextSpec,{id});
-          return res.data
-        },
-    })
-},['todo'],{revalidate:30, tags:['todo-list']})
+      nextServerContext: null,
+      operation: async (contextSpec) => {
+        // const res = await reqResBasedClient.graphql(contextSpec, {
+        //   query: listByType,
+        //   variables: {
+        //     type,
+        //   },
+        // });
+        // return res.data;
 
-// const getCacheData2 = unstable_cache((id: string)=>{
-//     return runWithAmplifyServerContext({
-//         nextServerContext: null,
-//         operation: async (contextSpec) => {
-//             const res =  await reqResBasedClient.models.Todo.listByType(contextSpec,{type:'TODO'});
-//             return res.data
-//         },
-//     })
-// },['todo'],{revalidate:30, tags:['todo-list']})
+        const { data, errors } = await reqResBasedClient.models.Todo.listByType(
+          //@ts-ignore
+          contextSpec,
+          { type }
+        );
+
+        return data;
+      },
+    });
+  },
+  ["todo"],
+  { revalidate: 30, tags: ["todo-list"] }
+);
 
 type PageProps = {
-    params: { id: string };
+  params: { type: string };
 };
 
-const Page = async ({params}:PageProps) => {
-    const data = await getCacheData(params.id);
-    return (
-        <div>
-            content:{data?.content}
-        </div>
-    );
+const Page = async ({ params }: PageProps) => {
+  const data = await getCacheData(params.type);
+  return <div>content:{data[0].content}</div>;
 };
 
 export default Page;

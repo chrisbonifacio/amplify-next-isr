@@ -12,19 +12,17 @@ const schema = a.schema({
       content: a.string(),
       type: a.string(),
     })
-      .secondaryIndexes(index=>[index('type').queryField('listByType')])
-      .authorization((allow) => [allow.publicApiKey()]),
+    .secondaryIndexes((index) => [index("type").queryField("listByType")])
+    .authorization((allow) => [allow.guest()]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
 
 export const data = defineData({
+  name: "SSRClientAPI",
   schema,
   authorizationModes: {
-    defaultAuthorizationMode: "apiKey",
-    apiKeyAuthorizationMode: {
-      expiresInDays: 30,
-    },
+    defaultAuthorizationMode: "identityPool",
   },
 });
 
