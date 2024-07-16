@@ -11,13 +11,14 @@ const getCacheData = unstable_cache(
     return runWithAmplifyServerContext({
       nextServerContext: null,
       operation: async (contextSpec) => {
-        // const res = await reqResBasedClient.graphql(contextSpec, {
-        //   query: listByType,
-        //   variables: {
+        // const { data, errors } = await reqResBasedClient.models.Todo.listByType(
+        //   contextSpec,
+        //   {
         //     type,
-        //   },
-        // });
-        // return res.data;
+        //   }
+        // );
+
+        // return data;
 
         console.log({ type });
 
