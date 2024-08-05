@@ -13,7 +13,11 @@ const schema = a.schema({
       type: a.string(),
     })
     .secondaryIndexes((index) => [index("type").queryField("listByType")])
-    .authorization((allow) => [allow.guest()]),
+    .authorization((allow) => [
+      allow.guest().to(["read"]),
+      allow.authenticated("identityPool").to(["read"]),
+      allow.groups(["ADMINS"]),
+    ]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
