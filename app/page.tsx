@@ -6,13 +6,26 @@ import "@aws-amplify/ui-react/styles.css";
 import { type Schema } from "@/amplify/data/resource";
 import { useEffect, useState } from "react";
 import { Authenticator } from "@aws-amplify/ui-react";
+import { signOut } from "aws-amplify/auth";
 
 const client = generateClient<Schema>();
 
 export default function App() {
   const [todos, setTodos] = useState<Schema["Todo"]["type"][]>([]);
+  const [device, setDeviceMeasures] = useState<
+    Schema["DeviceMeasures"]["type"] | null
+  >();
 
   async function createTodo() {
+    const { data, errors } = await client.models.Todo.create({
+      content: "Todo Content 2",
+      type: "TODO",
+    });
+
+    console.log({ data, errors });
+  }
+
+  async function createDevice() {
     const { data, errors } = await client.models.Todo.create({
       content: "Todo Content 2",
       type: "TODO",
@@ -35,6 +48,26 @@ export default function App() {
     listTodos();
   }, []);
 
+  useEffect(() => {
+    const subscription = client.models.DeviceMeasures.observeQuery({
+      filter: {
+        and: [
+          { tenantId: { eq: device?.tenantId } },
+          { name: { eq: device?.name } },
+        ],
+      },
+    }).subscribe({
+      next: ({ items }) => {
+        setDeviceMeasures(items[0] || null);
+      },
+      error: (err) => {
+        console.error(err);
+      },
+    });
+
+    return () => subscription.unsubscribe();
+  }, [device?.tenantId, device?.name]);
+
   return (
     <Authenticator>
       <main>
@@ -49,9 +82,8 @@ export default function App() {
         <div>
           🥳 App successfully hosted. Try creating a new todo.
           <br />
-          <a href="https://docs.amplify.aws/nextjs/start/quickstart/nextjs-app-router-client-components/">
-            Review next steps of this tutorial.
-          </a>
+          <button onClick={createTodo}>Create Todo</button>
+          <button onClick={() => signOut()}>Sign Out</button>
         </div>
       </main>
     </Authenticator>
