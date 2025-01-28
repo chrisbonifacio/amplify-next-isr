@@ -671,7 +671,7 @@ const schema = a.schema({
     ]),
   MatrixTest: a
     .model({
-      values: a.string().required().array().required().array().required(),
+      values: a.string().required().array().required(),
     })
     .authorization((allow) => [allow.publicApiKey()]),
 

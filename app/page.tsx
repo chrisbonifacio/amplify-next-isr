@@ -4,26 +4,41 @@ import { generateClient } from "aws-amplify/api";
 import "./../app/app.css";
 import "@aws-amplify/ui-react/styles.css";
 import { type Schema } from "@/amplify/data/resource";
-import { useEffect, useState } from "react";
 import { Authenticator } from "@aws-amplify/ui-react";
 import { signOut } from "aws-amplify/auth";
+import { useEffect, useState } from "react";
 
 const client = generateClient<Schema>();
 
 export default function App() {
-  const [todos, setTodos] = useState<Schema["Todo"]["type"][]>([]);
+  // const [todos, setTodos] = useState<Schema["Todo"]["type"][]>([]);
   const [device, setDeviceMeasures] = useState<
     Schema["DeviceMeasures"]["type"] | null
   >();
 
-  async function createTodo() {
-    const { data, errors } = await client.models.Todo.create({
-      content: "Todo Content 2",
-      type: "TODO",
-    });
+  // async function createTransactionMetadata() {
+  //   const userId = "1";
+  //   const transactionId = "1";
 
-    console.log({ data, errors });
-  }
+  //   await client.models.TransactionMetadata.create(
+  //     {
+  //       transactionId: transactionId, // comment to force redeployment
+  //       owners: [userId],
+  //     },
+  //     {
+  //       authMode: "userPool",
+  //     }
+  //   );
+  // }
+
+  // async function createTodo() {
+  //   const { data, errors } = await client.models.Todo.create({
+  //     content: "Todo Content 2",
+  //     type: "TODO",
+  //   });
+
+  //   console.log({ data, errors });
+  // }
 
   async function createDevice() {
     const { data, errors } = await client.models.Todo.create({
@@ -34,19 +49,19 @@ export default function App() {
     console.log({ data, errors });
   }
 
-  // await createTodo();
+  // // await createTodo();
 
-  async function listTodos() {
-    const { data, errors } = await client.models.Todo.list();
+  // async function listTodos() {
+  //   const { data, errors } = await client.models.Todo.list();
 
-    console.log({ data, errors });
+  //   console.log({ data, errors });
 
-    setTodos(data);
-  }
+  //   setTodos(data);
+  // }
 
-  useEffect(() => {
-    listTodos();
-  }, []);
+  // useEffect(() => {
+  //   listTodos();
+  // }, []);
 
   useEffect(() => {
     const subscription = client.models.DeviceMeasures.observeQuery({
@@ -72,17 +87,18 @@ export default function App() {
     <Authenticator>
       <main>
         <h1>Client Component</h1>
-        <ul>
+        {/* <ul>
           {todos.map((todo) => (
             <li key={todo.id}>
               {todo.id} {todo.content}{" "}
             </li>
           ))}
-        </ul>
+        </ul> */}
         <div>
           🥳 App successfully hosted. Try creating a new todo.
           <br />
-          <button onClick={createTodo}>Create Todo</button>
+          {/* <button onClick={createTodo}>Create Todo</button> */}
+          <button onClick={createDevice}>Create Device</button>
           <button onClick={() => signOut()}>Sign Out</button>
         </div>
       </main>
