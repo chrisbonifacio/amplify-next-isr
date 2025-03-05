@@ -1,107 +1,68 @@
 "use client";
 
+import * as React from "react";
+import {
+  Flex,
+  TextAreaField,
+  Loader,
+  Text,
+  View,
+  Button,
+  Authenticator,
+} from "@aws-amplify/ui-react";
+import { useAIGeneration } from "./client";
 import { generateClient } from "aws-amplify/api";
-import "./../app/app.css";
-import "@aws-amplify/ui-react/styles.css";
-import { type Schema } from "@/amplify/data/resource";
-import { Authenticator } from "@aws-amplify/ui-react";
-import { signOut } from "aws-amplify/auth";
-import { useEffect, useState } from "react";
+import { Schema } from "@/amplify/data/resource";
 
 const client = generateClient<Schema>();
 
 export default function App() {
-  // const [todos, setTodos] = useState<Schema["Todo"]["type"][]>([]);
-  const [device, setDeviceMeasures] = useState<
-    Schema["DeviceMeasures"]["type"] | null
-  >();
+  const [description, setDescription] = React.useState("");
+  const [{ data, isLoading }, generateRecipe] =
+    useAIGeneration("generateRecipe");
 
-  // async function createTransactionMetadata() {
-  //   const userId = "1";
-  //   const transactionId = "1";
+  const handleClick = async () => {
+    generateRecipe({ description });
+  };
 
-  //   await client.models.TransactionMetadata.create(
-  //     {
-  //       transactionId: transactionId, // comment to force redeployment
-  //       owners: [userId],
-  //     },
-  //     {
-  //       authMode: "userPool",
-  //     }
-  //   );
-  // }
-
-  // async function createTodo() {
-  //   const { data, errors } = await client.models.Todo.create({
-  //     content: "Todo Content 2",
-  //     type: "TODO",
-  //   });
-
-  //   console.log({ data, errors });
-  // }
-
-  async function createDevice() {
-    const { data, errors } = await client.models.Todo.create({
-      content: "Todo Content 2",
-      type: "TODO",
-    });
-
-    console.log({ data, errors });
-  }
-
-  // // await createTodo();
-
-  // async function listTodos() {
-  //   const { data, errors } = await client.models.Todo.list();
-
-  //   console.log({ data, errors });
-
-  //   setTodos(data);
-  // }
-
-  // useEffect(() => {
-  //   listTodos();
-  // }, []);
-
-  useEffect(() => {
-    const subscription = client.models.DeviceMeasures.observeQuery({
+  const test = async () => {
+    const {} = client.models.Todo.list({
       filter: {
-        and: [
-          { tenantId: { eq: device?.tenantId } },
-          { name: { eq: device?.name } },
-        ],
-      },
-    }).subscribe({
-      next: ({ items }) => {
-        setDeviceMeasures(items[0] || null);
-      },
-      error: (err) => {
-        console.error(err);
+        type: {
+          eq: "task",
+        },
       },
     });
-
-    return () => subscription.unsubscribe();
-  }, [device?.tenantId, device?.name]);
+  };
 
   return (
     <Authenticator>
-      <main>
-        <h1>Client Component</h1>
-        {/* <ul>
-          {todos.map((todo) => (
-            <li key={todo.id}>
-              {todo.id} {todo.content}{" "}
-            </li>
-          ))}
-        </ul> */}
-        <div>
-          🥳 App successfully hosted. Try creating a new todo.
-          <br />
-          {/* <button onClick={createTodo}>Create Todo</button> */}
-          <button onClick={createDevice}>Create Device</button>
-          <button onClick={() => signOut()}>Sign Out</button>
-        </div>
-      </main>
+      <Flex direction="column">
+        <Flex direction="row">
+          <TextAreaField
+            autoResize
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            label="Description"
+          />
+          <Button onClick={handleClick}>Generate recipe</Button>
+        </Flex>
+        {isLoading ? (
+          <Loader variation="linear" />
+        ) : (
+          <>
+            <Text fontWeight="bold">{data?.name}</Text>
+            <View as="ul">
+              {data?.ingredients?.map((ingredient) => (
+                <View as="li" key={ingredient}>
+                  {ingredient}
+                </View>
+              ))}
+            </View>
+            <Text>{data?.instructions}</Text>
+          </>
+        )}
+      </Flex>
     </Authenticator>
   );
 }
